@@ -3,10 +3,10 @@
     <h2 class="text-center mb-3 italic">Tic Tac Toe</h2>
     <section v-for="(row, rowIndex) in board" class="flex">
       <button
-        v-for="(square, squareIndex) in row"
+        v-for="(square, columnIndex) in row"
         type="button"
         class="w-12 h-12 flex items-center justify-center border"
-        @click="onMove(rowIndex, squareIndex)"
+        @click="onMove(rowIndex, columnIndex)"
       >
         <span v-if="square === 'o' || square === 'x'" :class="[ square === 'x' ? 'text-blue-600' : 'text-red-500' ]">
           {{ square }}
