@@ -8,14 +8,14 @@
         class="w-12 h-12 flex items-center justify-center border"
         @click="onMove(rowIndex, squareIndex)"
       >
-        <span v-if="square === 'o' || square === 'x'">
+        <span v-if="square === 'o' || square === 'x'" :class="[ square === 'x' ? 'text-blue-600' : 'text-red-500' ]">
           {{ square }}
         </span>
       </button>
     </section>
 
-    <h5 v-if="gameOver" class="mb-2 text-center">
-      <span v-if="winnerDefined">{{ lastMove.sign }} wins.</span>
+    <h5 v-if="gameIsOver" class="mb-2 text-center">
+      <span v-if="winnerIsDefined">{{ lastMove.sign }} wins.</span>
       <span v-else>tie.</span>
     </h5>
 
@@ -59,7 +59,7 @@ let lastMove = computed(() => {
   return moves.value[moves.value.length - 1]
 })
 
-let winnerDefined = computed(() => {
+let winnerIsDefined = computed(() => {
   if (lastMove.value === null) {
     return false
   }
@@ -74,12 +74,12 @@ let winnerDefined = computed(() => {
   return winsByHorizontal || winsByVertical || winsByDiagonal
 })
 
-let gameOver = computed(() => {
-  return winnerDefined.value || moves.value.length >= 9
+let gameIsOver = computed(() => {
+  return winnerIsDefined.value || moves.value.length >= 9
 })
 
 let onMove = (row: number, column: number) => {
-  if (gameOver.value) {
+  if (gameIsOver.value) {
     alert('Game is over')
     return
   }
