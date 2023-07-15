@@ -14,9 +14,8 @@
       </button>
     </section>
 
-    <h5 v-if="gameIsOver" class="mb-2">
-      Game is over:
-      <span v-if="winner"> {{ winner }} wins.</span>
+    <h5 v-if="gameOver" class="mb-2 text-center">
+      <span v-if="winnerDefined">{{ lastMove.sign }} wins.</span>
       <span v-else>tie.</span>
     </h5>
 
@@ -60,9 +59,9 @@ let lastMove = computed(() => {
   return moves.value[moves.value.length - 1]
 })
 
-let winner = computed(() => {
+let winnerDefined = computed(() => {
   if (lastMove.value === null) {
-    return null
+    return false
   }
 
   let winsByHorizontal = board.value[lastMove.value.row].every(square => square === lastMove.value.sign)
@@ -72,25 +71,21 @@ let winner = computed(() => {
   let winsByDiagonal = board.value.every((row, index) => row[0 + index] === lastMove.value.sign) ||
                        board.value.every((row, index) => row[board.value.length - 1 - index] === lastMove.value.sign)
 
-  if (winsByHorizontal || winsByVertical || winsByDiagonal) {
-    return lastMove.value.sign
-  }
-
-  return null
+  return winsByHorizontal || winsByVertical || winsByDiagonal
 })
 
-let gameIsOver = computed(() => {
-  return winner.value !== null || moves.value.length >= 9
+let gameOver = computed(() => {
+  return winnerDefined.value || moves.value.length >= 9
 })
 
 let onMove = (row: number, column: number) => {
-  if (gameIsOver.value) {
+  if (gameOver.value) {
     alert('Game is over')
     return
   }
 
   if (board.value[row][column] !== 'blank') {
-    alert('Cant use this square')
+    alert('Square is taken')
     return
   }
 
