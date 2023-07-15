@@ -31,61 +31,77 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-let board = ref([
-  [ 'blank', 'blank', 'blank' ],
-  [ 'blank', 'blank', 'blank' ],
-  [ 'blank', 'blank', 'blank' ]
-])
+let boardSize = 3
+let moves = ref([])
 
-let moveCount = ref(0)
-let winner = ref(null)
+let board = computed(() => {
+  let resultBoard = []
 
-let turn = computed(() => {
-  return moveCount.value % 2 === 0 ? 'x' : 'o'
+  for (let row = 0; row < boardSize; row++) {
+    resultBoard[row] = []
+    for (let column = 0; column < boardSize; column++) {
+      resultBoard[row][column] = 'blank'
+    }
+  }
+
+  for (let i = 0; i < moves.value.length; i++) {
+    let move = moves.value[i]
+    resultBoard[move.row][move.column] = move.sign
+  }
+
+  return resultBoard
+})
+
+let lastMove = computed(() => {
+  if (moves.value.length === 0) {
+    return null
+  }
+
+  return moves.value[moves.value.length - 1]
+})
+
+let winner = computed(() => {
+  if (lastMove.value === null) {
+    return null
+  }
+
+  let winsByHorizontal = board.value[lastMove.value.row].every(square => square === lastMove.value.sign)
+
+  let winsByVertical = board.value.every(row => row[lastMove.value.column] === lastMove.value.sign)
+
+  let winsByDiagonal = board.value.every((row, index) => row[0 + index] === lastMove.value.sign) ||
+                       board.value.every((row, index) => row[board.value.length - 1 - index] === lastMove.value.sign)
+
+  if (winsByHorizontal || winsByVertical || winsByDiagonal) {
+    return lastMove.value.sign
+  }
+
+  return null
 })
 
 let gameIsOver = computed(() => {
-  return winner.value !== null || moveCount.value >= 9
+  return winner.value !== null || moves.value.length >= 9
 })
 
-let onMove = (rowIndex: number, squareIndex: number) => {
+let onMove = (row: number, column: number) => {
   if (gameIsOver.value) {
     alert('Game is over')
     return
   }
 
-  if (board.value[rowIndex][squareIndex] !== 'blank') {
+  if (board.value[row][column] !== 'blank') {
     alert('Cant use this square')
     return
   }
 
-  board.value[rowIndex][squareIndex] = turn.value
-
-  if (moveWins(rowIndex, squareIndex, turn.value)) {
-    winner.value = turn.value
-  }
-
-  moveCount.value++
-}
-
-let moveWins = (rowIndex: number, squareIndex: number, turn: ('x' | 'o')) => {
-  let winsByHorizontal = board.value[rowIndex].every(square => square === turn)
-
-  let winsByVertical = board.value.every(row => row[squareIndex] === turn)
-
-  let winsByDiagonal = board.value.every((row, index) => row[0 + index] === turn) ||
-                       board.value.every((row, index) => row[board.value.length - 1 - index] === turn)
-
-  return winsByHorizontal || winsByVertical || winsByDiagonal
+  moves.value.push({
+    row: row,
+    column: column,
+    sign: (moves.value.length % 2 === 0 ? 'x' : 'o')
+  })
 }
 
 let onRestart = () => {
-    board.value = [
-      [ 'blank', 'blank', 'blank' ],
-      [ 'blank', 'blank', 'blank' ],
-      [ 'blank', 'blank', 'blank' ]
-    ]
-    moveCount.value = 0
-    winner.value = null
+    moves.value = []
 }
 </script>
