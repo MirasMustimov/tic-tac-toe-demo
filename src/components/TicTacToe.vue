@@ -11,8 +11,10 @@
         <span class="font-bold">{{ gameResultStats.x }} wins</span>
       </div>
       <div class="flex flex-col items-center text-[#9d9d9d]">
-        <XIcon class="w-3.5 h-3.5" />
-        <span class="font-bold">{{ gameResultStats.draw }} draws</span>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 -1 24 24" class="w-4 h-4">
+          <path fill="currentColor" fill-rule="evenodd" d="m6.17 4.347 3.779 11.337a1 1 0 0 1-.502 1.21l-.87.435a8 8 0 0 1-7.155 0l-.87-.435a1 1 0 0 1-.5-1.21L3.711 4.7c-.505.085-1.01.178-1.516.28a1 1 0 1 1-.392-1.962c3.064-.613 6.13-.95 9.196-1.01V1a1 1 0 0 1 2 0v1.01c3.066.06 6.132.396 9.196 1.01a1 1 0 0 1-.392 1.96 51.677 51.677 0 0 0-1.516-.28l3.66 10.984a1 1 0 0 1-.5 1.21l-.87.435a8 8 0 0 1-7.156 0l-.87-.435a1 1 0 0 1-.5-1.21L17.83 4.347A49.393 49.393 0 0 0 13 4.01V20h3a1 1 0 0 1 0 2H8a1 1 0 1 1 0-2h3V4.01c-1.61.033-3.22.145-4.83.337zm15.607 11.146L19 7.163l-2.777 8.33.094.047a6 6 0 0 0 5.366 0l.094-.047zM5 7.163l-2.777 8.33.094.047a6 6 0 0 0 5.366 0l.094-.047L5 7.163z" clip-rule="evenodd"/>
+        </svg>
+        <span class="font-bold -mt-0.5">{{ gameResultStats.draw }} draws</span>
       </div>
     </div>
 
@@ -43,6 +45,7 @@
           <XIcon v-if="lastMove.sign === 'x'" class="w-3 h-3 text-[#3989d4]" />
           <OIcon v-if="lastMove.sign === 'o'" class="w-3 h-3 text-[#39bcd4]" />
           <span class="uppercase text-slate-500 ml-1.5">wins</span>
+          <span>{{ randomPrize() }}</span>
         </template>
         <template v-if="gameIsOver && !winnerIsDefined">
           <span class="uppercase text-slate-500 ">draw</span>
@@ -180,5 +183,10 @@ let onMove = (row: number, column: number) => {
 
 let onReset = () => {
     moves.value = []
+}
+
+let randomPrize = () => {
+  let prizes = ['🎈', '🧁', '🍭', '🎮', '🪁', '🍉', '🍫']
+  return prizes[Math.floor(Math.random()*prizes.length)]
 }
 </script>
