@@ -1,5 +1,6 @@
 # Tic Tac Toe
-Game built with Vue 3 and Tailwind CSS
+Game built with Vue 3, Typescript and Tailwind CSS
+[Play here](https://tic-tac-toe-game-oxo.netlify.app)
 
 # Credits
 Design - [Dribble](https://dribbble.com/shots/3402966-Tic-Tac-Toe/)
