@@ -42,8 +42,8 @@
     <div class="flex justify-center mt-10">
       <div class="flex items-center justify-center border border-stone-200 rounded-full px-3 py-1 min-w-[90px]">
         <template v-if="gameIsOver && winnerIsDefined">
-          <XIcon v-if="lastMove.sign === 'x'" class="w-3 h-3 text-[#3989d4]" />
-          <OIcon v-if="lastMove.sign === 'o'" class="w-3 h-3 text-[#39bcd4]" />
+          <XIcon v-if="lastMove && lastMove.sign === 'x'" class="w-3 h-3 text-[#3989d4]" />
+          <OIcon v-if="lastMove && lastMove.sign === 'o'" class="w-3 h-3 text-[#39bcd4]" />
           <span class="uppercase text-slate-500 ml-1.5">wins</span>
           <span>{{ randomPrize() }}</span>
         </template>
@@ -95,8 +95,16 @@ import { ref, computed } from 'vue'
 import XIcon from './Icons/XIcon.vue'
 import OIcon from './Icons/OIcon.vue'
 
+type MoveSign = ('x' | 'o')
+
+type Move = {
+  row: number,
+  column: number,
+  sign: MoveSign
+}
+
 let boardSize = 3
-let moves = ref([])
+let moves = ref<Move[]>([])
 
 let gameResultStats = ref({
   x: 0,
@@ -105,7 +113,7 @@ let gameResultStats = ref({
 })
 
 let board = computed(() => {
-  let resultBoard = []
+  let resultBoard: (MoveSign | 'blank')[][] = []
 
   for (let row = 0; row < boardSize; row++) {
     resultBoard[row] = []
@@ -122,7 +130,7 @@ let board = computed(() => {
   return resultBoard
 })
 
-let turn = computed(() => {
+let turn = computed<MoveSign>(() => {
   if (lastMove.value === null) {
     return 'x'
   }
@@ -130,7 +138,7 @@ let turn = computed(() => {
   return lastMove.value.sign === 'x' ? 'o' : 'x'
 })
 
-let lastMove = computed(() => {
+let lastMove = computed<Move | null>(() => {
   if (moves.value.length === 0) {
     return null
   }
@@ -143,12 +151,14 @@ let winnerIsDefined = computed(() => {
     return false
   }
 
-  let winsByHorizontal = board.value[lastMove.value.row].every(square => square === lastMove.value.sign)
+  let move = lastMove.value
 
-  let winsByVertical = board.value.every(row => row[lastMove.value.column] === lastMove.value.sign)
+  let winsByHorizontal = board.value[move.row].every(square => square === move.sign)
 
-  let winsByDiagonal = board.value.every((row, index) => row[0 + index] === lastMove.value.sign) ||
-                       board.value.every((row, index) => row[board.value.length - 1 - index] === lastMove.value.sign)
+  let winsByVertical = board.value.every(row => row[move.column] === move.sign)
+
+  let winsByDiagonal = board.value.every((row, index) => row[0 + index] === move.sign) ||
+                       board.value.every((row, index) => row[board.value.length - 1 - index] === move.sign)
 
   return winsByHorizontal || winsByVertical || winsByDiagonal
 })
@@ -174,7 +184,7 @@ let onMove = (row: number, column: number) => {
     sign: (moves.value.length % 2 === 0 ? 'x' : 'o')
   })
 
-  if (gameIsOver.value) {
+  if (gameIsOver.value && lastMove.value) {
     winnerIsDefined.value
       ? gameResultStats.value[lastMove.value.sign]++
       : gameResultStats.value.draw++
@@ -187,6 +197,6 @@ let onReset = () => {
 
 let randomPrize = () => {
   let prizes = ['🎈', '🧁', '🍭', '🎮', '🪁', '🍉', '🍫']
-  return prizes[Math.floor(Math.random()*prizes.length)]
+  return prizes[Math.floor(Math.random() * prizes.length)]
 }
 </script>
